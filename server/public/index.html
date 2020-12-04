@@ -1,0 +1,29 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <script type="text/javascript">
+        function callNative() {
+            console.log("Native", Android)
+            if (Android) {
+                Android.showDialog("test");
+            } else {
+                alert("Not to day")
+            }
+        }
+        function MyFunction() {
+            // const hostName = location.hostname
+            var url = window.location.href
+            Native.saveImage(url + "images/doraemon.png");
+        }
+        function increment() {
+            var ob = document.getElementById("msg");
+            ob.innerText = parseInt(ob.innerText) + 1;
+        }
+    </script>
+</head>
+
+<body>
+    <div id="msg">0</div>
+    <a id="btn-download" onclick="MyFunction()">download</a><br />
+    <button onclick="callNative()">show dialog</button>
+</body>
