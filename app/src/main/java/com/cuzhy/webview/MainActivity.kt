@@ -3,20 +3,21 @@ package com.cuzhy.webview
 import android.Manifest
 import android.app.DownloadManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
-import android.view.ContextMenu
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.webkit.*
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.cuzhy.webview.request.WebViewInterface
 
 const val TAG: String = "MainActivity";
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var managePermissions: ManagePermissions;
     private val PermissionsRequestCode = 123
 
+    private val SELECT_PHOTO = 1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         val list = listOf<String>(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
-        managePermissions = ManagePermissions(this,list,PermissionsRequestCode)
+        managePermissions = ManagePermissions(this, list, PermissionsRequestCode)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) managePermissions.checkPermissions()
 
@@ -75,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun download (imageUrl:String) {
+    fun download(imageUrl: String) {
         if (managePermissions.isPermissionsGranted() == PackageManager.PERMISSION_GRANTED) {
             if (URLUtil.isNetworkUrl(imageUrl)) {
                 if (imageUrl != null) {
@@ -105,6 +107,45 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
+    fun photoPicker () {
+        val photoPickerIntent = Intent(Intent.ACTION_PICK)
+        photoPickerIntent.type = "image/*"
+        startActivityForResult(photoPickerIntent, SELECT_PHOTO)
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            SELECT_PHOTO -> {
+                if (resultCode == RESULT_OK) {
+                    Log.e("WebViewInterface", data.toString());
+                    val selectedImage: Uri? = data?.data
+                    Log.e("WebViewInterface SELECTED IMAGE", selectedImage.toString());
+                    webView.loadUrl("javascript:setFileUri('" + selectedImage.toString() + "')");
+                    val path = getRealPathFromURI(this, selectedImage!!)
+                    Log.e("WebViewInterface PATH", path.toString());
+                    webView.loadUrl("javascript:setFilePath('" + path + "')");
+
+                }
+            }
+        }
+    }
+
+    fun getRealPathFromURI(context: Context, contentUri: Uri):String {
+        var cursor:Cursor? = null;
+        try {
+            val proj = arrayOf(MediaStore.Images.Media.DATA)
+            cursor = context.contentResolver.query(contentUri, proj, null, null, null);
+            val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            cursor!!.moveToFirst()
+            return cursor.getString(column_index)
+        } finally {
+            cursor?.close()
+        }
+    }
+
 
 //    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
 //        super.onCreateContextMenu(menu, v, menuInfo)

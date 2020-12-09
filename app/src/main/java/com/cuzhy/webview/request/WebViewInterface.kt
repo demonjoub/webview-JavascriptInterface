@@ -1,23 +1,15 @@
 package com.cuzhy.webview.request
 
-import android.app.DownloadManager
+import android.app.Activity
 import android.content.Context
-import android.database.Cursor
+import android.content.Intent
 import android.net.Uri
-import android.os.Environment
 import android.util.Log
 import android.webkit.JavascriptInterface
-import android.webkit.URLUtil
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.cuzhy.webview.MainActivity
-import java.io.File
-import java.io.FileOutputStream
-import java.net.URL
 
 class WebViewInterface(private val mContext: Context) {
-
     @JavascriptInterface
     fun showDialog(message: String) {
         Log.e("WebViewInterface", "showToast")
@@ -28,5 +20,12 @@ class WebViewInterface(private val mContext: Context) {
     fun saveImage(imageUrl: String) {
         Log.e("TEST", imageUrl);
         (mContext as MainActivity).download(imageUrl);
+    }
+
+    @JavascriptInterface
+    fun choosePhoto(): String {
+        val file = "test"
+        (mContext as MainActivity).photoPicker();
+        return file
     }
 }

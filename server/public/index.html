@@ -19,11 +19,24 @@
             var ob = document.getElementById("msg");
             ob.innerText = parseInt(ob.innerText) + 1;
         }
+        function choosePhoto() {
+            var file = Native.choosePhoto();
+        }
+        function setFilePath(file) {
+            document.getElementById('lblpath').innerHTML = file;
+        }
+        function setFileUri(file) {
+            document.getElementById('lbluri').innerHTML = file;
+        }
     </script>
 </head>
 
 <body>
     <div id="msg">0</div>
     <a id="btn-download" onclick="MyFunction()">download</a><br />
-    <button onclick="callNative()">show dialog</button>
+    <button onclick="callNative()">show dialog</button><br/><br/>
+    File Uri: <label id="lbluri">no file path</label><br/>
+    File Path: <label id="lblpath">no file path</label><br/>
+    <br/>
+    <input type="button" value="Choose Photo" onClick="choosePhoto()" />
 </body>
